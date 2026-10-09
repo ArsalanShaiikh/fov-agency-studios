@@ -1,0 +1,405 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/geist-mono';
+
+/* ------------------------------------------------------------------
+   Fonts. Panchang and Switzer are Indian Type Foundry fonts under the
+   ITF Free Font License (docs/licenses/ITF-FFL.txt). Files are the
+   official, unmodified WOFF2s. Never subset or convert them.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Panchang';
+  src: url('/fonts/Panchang-Variable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  /* The wordmark is the LCP element; block (it is preloaded and ~37KB)
+     so a fallback never swaps in and shifts the centred wordmark. */
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Switzer Fallback';
+  src: local('Helvetica Neue'), local('Arial');
+  size-adjust: 98%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+/* ------------------------------------------------------------------
+   Design tokens (docs/DESIGN.md §2 to §5)
+   ------------------------------------------------------------------ */
+@theme {
+  --color-ink: #0b0b0a;
+  --color-ink-2: #141413;
+  --color-paper: #e9e8e4;
+  --color-smoke: #8c8a85;
+  --color-line: rgb(233 232 228 / 0.14);
+  --color-signal: #e9c440;
+  --color-signal-soft: #4a4020;
+  --color-window: #fff4d6;
+
+  --font-display: 'Panchang', 'Arial Black', sans-serif;
+  --font-sans: 'Switzer', 'Switzer Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Fluid type, 375px to ~3400px (4K is viewed from further away), then holds. */
+  /* Panchang is ultra-wide (~0.9em per glyph), so its display size is
+     tuned to fit "3D Websites" in 8 of 12 columns and 335px on a phone. */
+  --text-display: clamp(2rem, 0.8rem + 4.6vw, 11rem);
+  --text-display--line-height: 0.95;
+  --text-h2: clamp(2.25rem, 1rem + 4.5vw, 10rem);
+  --text-h2--line-height: 0.95;
+  --text-manifesto: clamp(2rem, 0.9rem + 3.6vw, 8.5rem);
+  --text-manifesto--line-height: 1.04;
+  --text-lead: clamp(1.125rem, 0.95rem + 0.55vw, 2.25rem);
+  --text-lead--line-height: 1.3;
+  --text-body: clamp(1rem, 0.95rem + 0.2vw, 1.5rem);
+  --text-body--line-height: 1.5;
+  --text-mono: clamp(0.75rem, 0.7rem + 0.15vw, 1.125rem);
+  --text-mono--line-height: 1.4;
+
+  --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 160rem;
+
+  --ease-lens: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-shutter: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-focus: cubic-bezier(0.45, 0, 0.15, 1);
+  --ease-lock: cubic-bezier(0.3, 1.4, 0.45, 1);
+}
+
+/* Grid and spacing (DESIGN.md §4) */
+:root {
+  --cols: 4;
+  --gutter: 16px;
+  --margin: 20px;
+  --frame-max: 200rem;
+  --section-pad: clamp(6rem, 4rem + 10vw, 18rem);
+  --nav-h: 64px;
+
+  /* Subject frame on screen (mirrors subjectFrame() in lib/cameraMath.js) */
+  --subject-h: 55svh;
+  --subject-w: min(55vw, 131svh);
+
+  /* z-index scale, mirrored in src/lib/layers.js */
+  --z-canvas: 0;
+  --z-content: 10;
+  --z-hud: 20;
+  --z-nav: 30;
+  --z-cursor: 40;
+  --z-overlay: 50;
+  --z-preloader: 60;
+}
+
+@media (orientation: portrait) {
+  :root {
+    --subject-h: 62svh;
+    --subject-w: min(84vw, 49.6svh);
+  }
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --cols: 8;
+    --gutter: 20px;
+    --margin: 32px;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --cols: 12;
+    --gutter: clamp(20px, 1.4vw, 40px);
+    --margin: clamp(32px, 3.5vw, 96px);
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    /* Keyboard-focused anchors never land under the fixed nav. */
+    scroll-padding-top: calc(var(--nav-h) + 1rem);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-weight: 400;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 4px;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: inherit;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* Lenis (smooth scroll) recommended rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------ */
+@utility frame {
+  width: min(100% - 2 * var(--margin), var(--frame-max));
+  margin-inline: auto;
+}
+
+@utility grid-frame {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+@utility section-pad {
+  padding-block: var(--section-pad);
+}
+
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  line-height: var(--text-mono--line-height);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+@utility headline {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+@utility stage {
+  height: 100svh;
+  min-height: 34rem;
+}
+
+/* Text split by SplitText: keep descenders clear inside line masks. */
+.split-line {
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* Wordmark sizing (hero). Landscape: one line inside the subject frame.
+   Portrait: stacked F / O / V (DESIGN.md §7.1). */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.8;
+  font-size: min(14.2vw, 30svh);
+  white-space: nowrap;
+}
+.wordmark > span {
+  display: inline-block;
+}
+@media (orientation: portrait) {
+  .wordmark {
+    font-size: min(29vw, 14.5svh);
+    line-height: 0.86;
+    white-space: normal;
+  }
+  .wordmark > span {
+    display: block;
+  }
+}
+
+/* Services (desktop): one name in focus, its details in the shared panel.
+   Reduced motion keeps the stacked mobile layout instead of a pinned stage. */
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  [data-services-stage] [data-service] h3 {
+    /* 0.4 keeps inactive names at ~3.3:1 (AA for large text) while the
+       active one sits at full strength. */
+    opacity: 0.4;
+    transition: opacity 0.7s var(--ease-lens);
+  }
+  [data-services-stage] .service-detail {
+    opacity: 0;
+    translate: 0 14px;
+    visibility: hidden;
+    transition:
+      opacity 0.6s var(--ease-lens),
+      translate 0.8s var(--ease-lens),
+      visibility 0s 0.6s;
+  }
+  [data-services-stage][data-active='0'] [data-service='0'] h3,
+  [data-services-stage][data-active='1'] [data-service='1'] h3,
+  [data-services-stage][data-active='2'] [data-service='2'] h3 {
+    opacity: 1;
+  }
+  [data-services-stage][data-active='0'] [data-service='0'] .service-detail,
+  [data-services-stage][data-active='1'] [data-service='1'] .service-detail,
+  [data-services-stage][data-active='2'] [data-service='2'] .service-detail {
+    opacity: 1;
+    translate: 0 0;
+    visibility: visible;
+    transition:
+      opacity 0.6s var(--ease-lens) 0.15s,
+      translate 0.8s var(--ease-lens) 0.15s,
+      visibility 0s;
+  }
+}
+
+/* Work: hovering one piece racks it into focus and softens the others. */
+@media (hover: hover) and (pointer: fine) {
+  [data-work-list] [data-media] {
+    transition:
+      filter 0.7s var(--ease-focus),
+      opacity 0.7s var(--ease-focus);
+  }
+  [data-work-list]:has(a:hover) a:not(:hover) [data-media] {
+    filter: blur(4px);
+    opacity: 0.55;
+  }
+}
+
+/* When WebGL draws the work media and the dolly demo, hide the DOM stand-ins
+   (labels stay). Set on <html> by three/WorkPlanes and three/DollyDemo. */
+html[data-webgl-media] [data-work-list] [data-media-art],
+html[data-webgl-demo] [data-dolly-fallback] {
+  opacity: 0;
+}
+html[data-webgl-demo] [data-dolly-view],
+html[data-webgl-demo] [data-dolly-tile] {
+  background: transparent;
+}
+
+/* Range input (Open: dolly zoom demo) */
+.lens-range {
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: ew-resize;
+}
+.lens-range::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--color-paper);
+}
+.lens-range::-moz-range-track {
+  height: 1px;
+  background: var(--color-paper);
+}
+.lens-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 22px;
+  margin-top: -11px;
+  background: var(--color-signal);
+  border: 0;
+  border-radius: 0;
+}
+.lens-range::-moz-range-thumb {
+  width: 14px;
+  height: 22px;
+  background: var(--color-signal);
+  border: 0;
+  border-radius: 0;
+}
+
+/* Horizontal rail (mobile Open tiles) */
+.rail {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+.rail > * {
+  scroll-snap-align: start;
+}
+
+/* Prerendered HTML: start the hero in its intro state so hydration never flashes. */
+.js [data-vision] {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-wordmark] {
+    filter: blur(16px);
+  }
+}
+
+/* Signal-yellow end card flips the nav to ink. */
+[data-nav-theme='signal'] {
+  --nav-scrim: rgb(233 196 64 / 0.92);
+  --nav-fg: var(--color-ink);
+  --nav-bg-hover: var(--color-ink);
+  --nav-fg-hover: var(--color-signal);
+}
+[data-nav-theme='ink'] {
+  --nav-scrim: rgb(11 11 10 / 0.88);
+  --nav-fg: var(--color-paper);
+  --nav-bg-hover: var(--color-paper);
+  --nav-fg-hover: var(--color-ink);
+}
+
+/* Reduced motion: GSAP timelines branch on gsap.matchMedia(); CSS only
+   needs to stop anything that travels. Opacity fades stay. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .motion-travel {
+    transition-property: opacity, color, background-color, border-color !important;
+  }
+}

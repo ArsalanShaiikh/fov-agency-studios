@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=panchang@800&f[]=switzer@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&display=swap">
+<style>
+  html,body{margin:0;height:100%;background:#0B0B0A;overflow:hidden}
+  canvas{position:fixed;inset:0}
+  .wm{position:fixed;inset:0;display:grid;place-items:center;font:800 17vw/1 Panchang;color:#E9E8E4;pointer-events:none}
+  .vision{position:fixed;left:3.5vw;bottom:4vh;max-width:30ch;font:500 1.35vw/1.3 Switzer;color:#E9E8E4;letter-spacing:-.01em}
+  .hud{position:fixed;right:3.5vw;bottom:4vh;font:500 13px 'Geist Mono';letter-spacing:.04em;color:#E9E8E4}
+  .hud b{color:#E9C440;font-weight:500}
+  .nav{position:fixed;left:3.5vw;right:3.5vw;top:22px;display:flex;justify-content:space-between;font:500 14px Switzer;color:#E9E8E4}
+  .nav .l{font:800 18px Panchang}
+  .nav .cta{border:1px solid #E9E8E4;padding:8px 14px;margin-left:18px}
+</style></head>
+<body>
+<div class="nav"><span class="l">FOV</span><span>Work &nbsp;&nbsp; Services &nbsp;&nbsp; Process &nbsp;&nbsp; Open <span class="cta">Start a project</span></span></div>
+<div class="wm" id="wm">FOV</div>
+<p class="vision">The internet should feel like a place again, not a feed. We're building the places and films worth stopping for.</p>
+<div class="hud" id="hud"></div>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.186.1/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+const q = new URLSearchParams(location.search);
+const fov = parseFloat(q.get('fov') || '8');
+const W = innerWidth, H = innerHeight, aspect = W / H;
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H);
+renderer.setClearColor(0x0B0B0A);
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0B0B0A, 4, 46);
+
+// seeded random
+let s = 7; const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+const ratios = [2.39, 1.85, 16/9, 4/3, 1, 4/5, 9/16];
+const lineMat = new THREE.MeshBasicMaterial({ color: 0xE9E8E4 });
+const subjMat = new THREE.MeshBasicMaterial({ color: 0xE9C440 });
+function frame(w, h, z, t, mat, rot = 0, ox = 0, oy = 0) {
+  const g = new THREE.Group();
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(w + t, t), mat); top.position.y = h / 2;
+  const bot = top.clone(); bot.position.y = -h / 2;
+  const l = new THREE.Mesh(new THREE.PlaneGeometry(t, h + t), mat); l.position.x = -w / 2;
+  const r = l.clone(); r.position.x = w / 2;
+  g.add(top, bot, l, r); g.position.set(ox, oy, z); g.rotation.z = rot; scene.add(g);
+}
+// subject frame = viewport ratio, height 1
+const subjH = 1, subjW = aspect < 1 ? 0.62 * subjH : Math.min(aspect, 2.39) * subjH;
+frame(subjW, subjH, 0, 0.006, q.get('lock') ? subjMat : lineMat);
+// tunnel frames
+for (let z = 11; z > -50; z -= 1.45) {
+  if (Math.abs(z) < 0.6) continue;
+  const r = ratios[Math.floor(rnd() * ratios.length)];
+  const hh = 0.85 + rnd() * 0.7; let ww = hh * r; if (ww > 2.8) ww = 2.8;
+  frame(ww, hh, z, 0.006, lineMat, (rnd() - .5) * 0.06, (rnd() - .5) * 0.12, (rnd() - .5) * 0.08);
+}
+// end window
+const win = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.7), new THREE.MeshBasicMaterial({ color: 0xFFF4D6, fog: false }));
+win.position.z = -52; scene.add(win);
+// dust
+const N = 4000, pos = new Float32Array(N * 3);
+for (let i = 0; i < N; i++) { pos[i*3] = (rnd() - .5) * 6; pos[i*3+1] = (rnd() - .5) * 3.5; pos[i*3+2] = 12 - rnd() * 62; }
+const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+scene.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xE9E8E4, size: 0.012, transparent: true, opacity: 0.55 })));
+
+// dolly zoom: keep subject at k of viewport height
+const k = aspect < 1 ? 0.62 : 0.55;
+const d = subjH / (2 * k * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
+const cam = new THREE.PerspectiveCamera(fov, aspect, 0.05, 200);
+cam.position.set(0, 0, d);
+renderer.render(scene, cam);
+const f = 12 / Math.tan(THREE.MathUtils.degToRad(fov) / 2);
+document.getElementById('hud').innerHTML = `FOV <b>${fov.toFixed(1)}°</b> &nbsp; ${Math.round(f)}MM`;
+document.getElementById('wm').style.fontSize = `${(k * subjH / subjH) * 0.42 * 100}vh`;
+if (aspect < 1) {
+  const wm = document.getElementById('wm');
+  wm.innerHTML = 'F<br>O<br>V';
+  wm.style.fontSize = '30vw'; wm.style.lineHeight = '0.84'; wm.style.textAlign = 'center';
+  document.querySelector('.nav').innerHTML = '<span class="l">FOV</span><span>Menu</span>';
+  const v = document.querySelector('.vision'); v.style.font = '500 16px/1.35 Switzer'; v.style.bottom = '64px'; v.style.left = '20px'; v.style.right='20px'; v.style.maxWidth='none';
+  const h = document.getElementById('hud'); h.style.right = '20px'; h.style.bottom = '22px';
+}
+document.title = 'ready';
+</script>
+</body></html>

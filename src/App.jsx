@@ -1,122 +1,103 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { ScrollTrigger } from './animations/gsap'
+import { initSmoothScroll } from './animations/smoothScroll'
+import { detectTier, detectWebGL } from './lib/device'
+import { getState, setState, useStore } from './lib/store'
+import Preloader from './components/Preloader'
+import FocusCursor from './components/FocusCursor'
+import Nav from './components/Nav'
+import FrameFallback from './components/FrameFallback'
+import CameraReadout from './components/CameraReadout'
+import ProjectOverlay from './components/ProjectOverlay'
+import MenuOverlay from './components/MenuOverlay'
+import CreditsDialog from './components/CreditsDialog'
+import Hero from './sections/Hero'
+import Manifesto from './sections/Manifesto'
+import Services from './sections/Services'
+import Work from './sections/Work'
+import Process from './sections/Process'
+import Open from './sections/Open'
+import EndCard from './sections/EndCard'
 
-function App() {
-  const [count, setCount] = useState(0)
+// three.js and the scene load in their own chunk, after first paint.
+const SceneCanvas = lazy(() => import('./three/SceneCanvas'))
+
+export default function App() {
+  const webgl = useStore((s) => s.webgl)
+  const sceneRequested = useStore((s) => s.sceneRequested)
+  // Hold the CSS frames until the 3D frames start flying in (preloader done).
+  const sceneLive = useStore((s) => s.sceneReady && s.loaded)
+
+  useLayoutEffect(() => {
+    setState({ webgl: detectWebGL(), tier: detectTier() })
+  }, [])
+
+  useEffect(() => initSmoothScroll(), [])
+
+  // 3D loads straight away on capable devices. On the low tier (phones) it
+  // waits for the first interaction or an idle moment, so it never competes
+  // with the first paint; the hero's 3D is scroll-driven anyway.
+  useEffect(() => {
+    if (!webgl) return
+    if (getState().tier !== 'low') {
+      setState({ sceneRequested: true })
+      return
+    }
+    const events = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll']
+    const cleanup = () => {
+      events.forEach((e) => window.removeEventListener(e, go))
+      window.clearTimeout(idle)
+    }
+    const go = () => {
+      cleanup()
+      setState({ sceneRequested: true })
+    }
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+    const idle = window.setTimeout(go, 6000)
+    return cleanup
+  }, [webgl])
+
+  useEffect(() => {
+    document.fonts.ready.then(() => ScrollTrigger.refresh())
+  }, [])
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-(--z-preloader) focus:bg-signal focus:px-4 focus:py-2 focus:text-ink"
+      >
+        Skip to content
+      </a>
 
-      <div className="ticks"></div>
+      <FrameFallback visible={!sceneLive} />
+      {webgl && sceneRequested && (
+        <Suspense fallback={null}>
+          <SceneCanvas />
+        </Suspense>
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <Nav />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <main id="main" tabIndex={-1} className="relative z-(--z-content) outline-none">
+        <Hero />
+        <Manifesto />
+        <Services />
+        <Work />
+        <Process />
+        <Open />
+      </main>
+
+      <div className="relative z-(--z-content)">
+        <EndCard />
+      </div>
+
+      <CameraReadout />
+      <FocusCursor />
+      <Preloader />
+      <ProjectOverlay />
+      <MenuOverlay />
+      <CreditsDialog />
     </>
   )
 }
-
-export default App

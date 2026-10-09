@@ -1,13 +1,46 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fov-agency-studios</title>
+    <title>FOV | 3D websites, motion and film. Mumbai, for everywhere.</title>
+    <meta
+      name="description"
+      content="FOV is a Mumbai studio making 3D websites, motion and film for brands that want to be impossible to ignore online."
+    />
+    <meta name="theme-color" content="#0B0B0A" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PLACEHOLDER: replace the domain once the studio domain is live -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="FOV | 3D websites, motion and film" />
+    <meta
+      property="og:description"
+      content="The internet should feel like a place again, not a feed. We're building the places and films worth stopping for."
+    />
+    <meta property="og:url" content="https://fov.studio/" />
+    <meta property="og:image" content="https://fov.studio/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script>
+      // Hold the hero's intro states (blurred wordmark, hidden vision line) for
+      // the prerendered HTML; failsafe if the app never boots.
+      document.documentElement.classList.add('js')
+      setTimeout(function () {
+        if (!window.__fovBooted) document.documentElement.classList.remove('js')
+      }, 8000)
+    </script>
+    <link rel="preload" href="/fonts/Panchang-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="font-family: sans-serif; color: #e9e8e4; background: #0b0b0a; padding: 2rem">
+        FOV is a Mumbai studio making 3D websites, motion and film. Write to hello@fov.studio.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
