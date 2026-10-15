@@ -2,7 +2,6 @@
 // Usage: node scripts/qa-axe.mjs [--url http://localhost:5419]
 import { chromium } from 'playwright'
 import fs from 'node:fs'
-import path from 'node:path'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
@@ -10,16 +9,10 @@ const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'
 const argv = process.argv.slice(2)
 const URL = argv.includes('--url') ? argv[argv.indexOf('--url') + 1] : 'http://localhost:5419/'
 
-function executablePath() {
-  if (process.env.PW_CHROMIUM) return process.env.PW_CHROMIUM
-  const bundled = chromium.executablePath()
-  if (fs.existsSync(bundled)) return bundled
-  const cache = path.join(process.env.HOME, 'Library/Caches/ms-playwright')
-  const dir = fs.readdirSync(cache).filter((d) => /^chromium-\d+$/.test(d)).sort().pop()
-  return path.join(cache, dir, 'chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing')
-}
-
-const browser = await chromium.launch({ executablePath: executablePath() })
+// Playwright's own Chromium if installed, otherwise the system's Edge.
+const browser = fs.existsSync(chromium.executablePath())
+  ? await chromium.launch()
+  : await chromium.launch({ channel: process.env.PW_CHANNEL || 'msedge' })
 const runs = [
   { name: 'desktop 1440', viewport: { width: 1440, height: 900 } },
   { name: 'mobile 390', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },

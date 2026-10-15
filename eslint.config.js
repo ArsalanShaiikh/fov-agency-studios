@@ -19,12 +19,6 @@ export default defineConfig([
     },
   },
   {
-    // React Three Fiber mutates three.js objects (camera, uniforms, renderer)
-    // inside useFrame by design; the compiler's immutability rule can't model that.
-    files: ['src/three/**/*.{js,jsx}'],
-    rules: { 'react-hooks/immutability': 'off' },
-  },
-  {
     files: ['scripts/**/*.{js,mjs}'],
     languageOptions: { globals: globals.node },
   },

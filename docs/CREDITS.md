@@ -1,52 +1,46 @@
-# Credits and licences
+# Credits and licences: Bombay Craft
 
-Everything third-party used on the site, with its source, author and licence. The same list
-appears on the site in the footer's **Credits** dialog (`src/lib/content.js` → `CREDITS`).
+Everything third-party used on the site, with its source, author and licence.
 
-## 3D models
+## Logo
 
-| Asset | Source | Author | Licence | Use on site | File |
-|---|---|---|---|---|---|
-| Vintage Video Camera (`vintage_video_camera`, 1k) | [polyhaven.com/a/vintage_video_camera](https://polyhaven.com/a/vintage_video_camera) | Jenelle van Heerden (photography, model), James Ray Cock (textures) | [CC0 1.0](https://polyhaven.com/license) | Video lens state in Services | `src/assets/models/vintage-camera.glb` |
-
-**Processing:** `gltf-transform optimize --compress meshopt --texture-compress webp
---texture-size 1024` (gltf-transform CLI 4.5.1). This took it from 2.71MB to 432KB, with 17,871
-triangles and three 1024² WebP textures. Required extensions: `EXT_meshopt_compression`,
-`EXT_texture_webp` and `KHR_mesh_quantization`. CC0 needs no attribution; we credit it anyway.
-
-No HDRIs or textures are downloaded. Lighting uses drei `<Lightformer>`s, and the frame tunnel,
-dust, window and work-plane art are all procedural (shaders in `src/three/shaders/`).
-
-## Typefaces
-
-| Family | Source | Author | Licence | Files |
-|---|---|---|---|---|
-| Panchang (Variable) | [fontshare.com/fonts/panchang](https://www.fontshare.com/fonts/panchang) | Indian Type Foundry | ITF Free Font License v2.0 ([text](./licenses/ITF-FFL.txt)) | `public/fonts/Panchang-Variable.woff2` |
-| Switzer (Variable) | [fontshare.com/fonts/switzer](https://www.fontshare.com/fonts/switzer) | Indian Type Foundry | ITF Free Font License v2.0 ([text](./licenses/ITF-FFL.txt)) | `public/fonts/Switzer-Variable.woff2` |
-| Geist Mono (Variable) | [@fontsource-variable/geist-mono](https://fontsource.org/fonts/geist-mono) | Vercel | SIL Open Font License 1.1 | bundled from `node_modules` |
-
-**FFL terms that apply to us:** commercial use and self-hosting are allowed. The files must stay
-unmodified: no subsetting and no format conversion. The SHA-256 hashes of the shipped files
-match the official kit. They must not be redistributed through a public repository, so this repo
-is private (founder decision, 2026-10-10). Clients who need the fonts download their own copy
-from Fontshare.
+`src/assets/logo/bombay_crafts_logo.svg` is the agency's own mark (a PNG wrapped in SVG, 1.5MB).
+The site ships `src/assets/logo/bombay-crafts-mark.webp` instead: the same artwork cropped to the
+mark, with the background turned into transparency, 1100px wide, 33KB. It is used as a CSS mask
+(`.logo-mask`), so it can be drawn in any colour (cream on the dark site).
 
 ## Imagery
 
-None yet. The four Selected Work pieces and the Open "Notes" tile use **PLACEHOLDER** art, the
-site's own procedural frame motif labelled "Image to come". To swap in real images, add files
-under `src/assets/work/`, import them in `src/lib/content.js` and set each project's `image`.
-The WebGL planes pick them up automatically.
+None on the home page. The loom, the Pattern Lab cloth and the preloader sand are drawn live in canvas
+(src/home/loom.js, weave.js, sand.js). The preloader lines are original copy written for the brand,
+not quotations from films.
 
-Four AI-generated candidate stills (headphones, handloom, e-bike, light trails) were made with
-Canva's image generator and are in the studio's Canva uploads (media IDs `MAHXi5T-C4w`,
-`MAHXi-OFm9U`, `MAHXi5KpnFI`, `MAHXiw9P6Iw`). They aren't on the site because only 200px
-previews could be exported. If they're used, credit them here as AI-generated placeholder
-imagery.
+## Typefaces
+
+| Family | Source | Author | Licence | File |
+|---|---|---|---|---|
+| General Sans (Variable) | [fontshare.com/fonts/general-sans](https://www.fontshare.com/fonts/general-sans) | Indian Type Foundry | ITF Free Font License v2.0 ([text](./licenses/ITF-FFL.txt)) | `public/fonts/GeneralSans-Variable.woff2` |
+| Tiro Devanagari Marathi (Regular, Italic) | [@fontsource/tiro-devanagari-marathi](https://fontsource.org/fonts/tiro-devanagari-marathi) | Tiro Typeworks | SIL Open Font License 1.1 | bundled from `node_modules` |
+| IBM Plex Mono (400, 500) | [@fontsource/ibm-plex-mono](https://fontsource.org/fonts/ibm-plex-mono) | IBM / Bold Monday | SIL Open Font License 1.1 | bundled from `node_modules` |
+
+**FFL terms that apply to us:** commercial use and self-hosting are allowed. The file must stay
+unmodified: no subsetting and no format conversion. It must not be redistributed through a public
+repository, so this repo stays private.
 
 ## Code libraries
 
-All installed from npm, each under its own licence: React, React DOM, three.js, React Three
-Fiber, drei and postprocessing (MIT), and GSAP with `@gsap/react` (GSAP's standard "no charge"
-licence; every plugin has been free since 3.13). Also Lenis (MIT), Tailwind CSS (MIT) and
-Phosphor Icons (MIT).
+All installed from npm, each under its own licence: React and React DOM (MIT), GSAP with
+`@gsap/react` (GSAP's standard "no charge" licence), Lenis (MIT), three.js (MIT, hero 3D, loaded in its own chunk), Tailwind
+CSS (MIT) and Phosphor Icons (MIT).
+
+## Files not in the repo
+
+The repository is public, so two files are kept local and listed in `.gitignore`:
+
+- `public/fonts/GeneralSans-Variable.woff2`: the ITF Free Font License forbids redistributing the
+  font through a public repository. Download General Sans from
+  [fontshare.com/fonts/general-sans](https://www.fontshare.com/fonts/general-sans) and copy the
+  official `GeneralSans-Variable.woff2` into `public/fonts/`.
+- `src/assets/home/marine-drive-sunset.mp4` (and its `-poster.webp`): rights for this clip are not
+  confirmed. Add it locally, or replace it with footage the studio owns. The home page does not
+  use it at the moment.

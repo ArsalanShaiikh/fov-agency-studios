@@ -1,157 +1,130 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/geist-mono';
+@import '@fontsource/tiro-devanagari-marathi/latin-400-italic.css';
+@import '@fontsource/tiro-devanagari-marathi/devanagari-400.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
 
 /* ------------------------------------------------------------------
-   Fonts. Panchang and Switzer are Indian Type Foundry fonts under the
-   ITF Free Font License (docs/licenses/ITF-FFL.txt). Files are the
-   official, unmodified WOFF2s. Never subset or convert them.
+   Type (docs/CREDITS.md). General Sans (Indian Type Foundry, ITF FFL)
+   carries the voice; Tiro Devanagari Marathi (Tiro Typeworks, OFL) is
+   the accent: its Latin italic for single words, its Devanagari for
+   small Marathi details. The subtle Indian typographic influence the
+   brand asks for, never decoration. IBM Plex Mono (OFL) is the retro
+   machine voice: punch cards, labels, numbers.
    ------------------------------------------------------------------ */
 @font-face {
-  font-family: 'Panchang';
-  src: url('/fonts/Panchang-Variable.woff2') format('woff2');
-  font-weight: 200 800;
-  font-style: normal;
-  /* The wordmark is the LCP element; block (it is preloaded and ~37KB)
-     so a fallback never swaps in and shifts the centred wordmark. */
-  font-display: block;
-}
-
-@font-face {
-  font-family: 'Switzer';
-  src: url('/fonts/Switzer-Variable.woff2') format('woff2');
-  font-weight: 100 900;
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans-Variable.woff2') format('woff2');
+  font-weight: 200 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Switzer Fallback';
+  font-family: 'General Sans Fallback';
   src: local('Helvetica Neue'), local('Arial');
-  size-adjust: 98%;
-  ascent-override: 96%;
-  descent-override: 24%;
-  line-gap-override: 0%;
+  size-adjust: 100%;
+  ascent-override: 92%;
+  descent-override: 22%;
 }
 
 /* ------------------------------------------------------------------
-   Design tokens (docs/DESIGN.md §2 to §5)
+   Palette (docs/BRAND.md §11): oxblood, warm ivory, charcoal and a
+   restrained brass accent.
    ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #0b0b0a;
-  --color-ink-2: #141413;
-  --color-paper: #e9e8e4;
-  --color-smoke: #8c8a85;
-  --color-line: rgb(233 232 228 / 0.14);
-  --color-signal: #e9c440;
-  --color-signal-soft: #4a4020;
-  --color-window: #fff4d6;
+  --color-ivory: #f5efe1;
+  --color-ivory-2: #ece3cf;
+  --color-charcoal: #141011;
+  --color-charcoal-2: #1e1819;
+  --color-oxblood: #790d16;
+  --color-oxblood-2: #5e0a11;
+  --color-brass: #c9ab78;
+  --color-sand: #e5d3af;
+  --color-mute: #a39a8c;
+  --color-mute-dark: #5f554b;
 
-  --font-display: 'Panchang', 'Arial Black', sans-serif;
-  --font-sans: 'Switzer', 'Switzer Fallback', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-sans: 'General Sans', 'General Sans Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-accent: 'Tiro Devanagari Marathi', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
-  /* Fluid type, 375px to ~3400px (4K is viewed from further away), then holds. */
-  /* Panchang is ultra-wide (~0.9em per glyph), so its display size is
-     tuned to fit "3D Websites" in 8 of 12 columns and 335px on a phone. */
-  --text-display: clamp(2rem, 0.8rem + 4.6vw, 11rem);
-  --text-display--line-height: 0.95;
-  --text-h2: clamp(2.25rem, 1rem + 4.5vw, 10rem);
+  --text-mega: clamp(3rem, 0.6rem + 8.4vw, 11.5rem);
+  --text-mega--line-height: 0.9;
+  --text-h2: clamp(2.5rem, 1.1rem + 4.6vw, 7rem);
   --text-h2--line-height: 0.95;
-  --text-manifesto: clamp(2rem, 0.9rem + 3.6vw, 8.5rem);
-  --text-manifesto--line-height: 1.04;
-  --text-lead: clamp(1.125rem, 0.95rem + 0.55vw, 2.25rem);
-  --text-lead--line-height: 1.3;
-  --text-body: clamp(1rem, 0.95rem + 0.2vw, 1.5rem);
-  --text-body--line-height: 1.5;
-  --text-mono: clamp(0.75rem, 0.7rem + 0.15vw, 1.125rem);
-  --text-mono--line-height: 1.4;
-
-  --breakpoint-3xl: 120rem;
-  --breakpoint-4xl: 160rem;
+  --text-lead: clamp(1.0625rem, 0.97rem + 0.4vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-body: clamp(0.9688rem, 0.93rem + 0.15vw, 1.0625rem);
+  --text-body--line-height: 1.6;
+  --text-small: clamp(0.75rem, 0.72rem + 0.1vw, 0.8125rem);
+  --text-small--line-height: 1.4;
 
   --ease-lens: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-shutter: cubic-bezier(0.76, 0, 0.24, 1);
-  --ease-focus: cubic-bezier(0.45, 0, 0.15, 1);
-  --ease-lock: cubic-bezier(0.3, 1.4, 0.45, 1);
 }
 
-/* Grid and spacing (DESIGN.md §4) */
 :root {
-  --cols: 4;
-  --gutter: 16px;
   --margin: 20px;
-  --frame-max: 200rem;
-  --section-pad: clamp(6rem, 4rem + 10vw, 18rem);
-  --nav-h: 64px;
-
-  /* Subject frame on screen (mirrors subjectFrame() in lib/cameraMath.js) */
-  --subject-h: 55svh;
-  --subject-w: min(55vw, 131svh);
-
-  /* z-index scale, mirrored in src/lib/layers.js */
-  --z-canvas: 0;
-  --z-content: 10;
-  --z-hud: 20;
-  --z-nav: 30;
-  --z-cursor: 40;
-  --z-overlay: 50;
-  --z-preloader: 60;
-}
-
-@media (orientation: portrait) {
-  :root {
-    --subject-h: 62svh;
-    --subject-w: min(84vw, 49.6svh);
-  }
+  --gutter: 12px;
+  --frame-max: 96rem;
+  --section-pad: clamp(6rem, 3rem + 9vw, 12rem);
+  --nav-h: 72px;
 }
 
 @media (min-width: 48rem) {
   :root {
-    --cols: 8;
-    --gutter: 20px;
-    --margin: 32px;
+    --margin: 36px;
+    --gutter: 16px;
   }
 }
 
 @media (min-width: 64rem) {
   :root {
-    --cols: 12;
-    --gutter: clamp(20px, 1.4vw, 40px);
-    --margin: clamp(32px, 3.5vw, 96px);
+    --margin: clamp(40px, 3.6vw, 72px);
+    --gutter: 20px;
   }
 }
 
 @layer base {
   html {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-charcoal);
+    color: var(--color-ivory);
     color-scheme: dark;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
-    /* Keyboard-focused anchors never land under the fixed nav. */
     scroll-padding-top: calc(var(--nav-h) + 1rem);
+  }
+
+  /* Film grain over everything: a printed, slightly analogue finish. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   body {
     margin: 0;
-    background: var(--color-ink);
+    background: var(--color-charcoal);
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    font-weight: 400;
     overflow-x: clip;
   }
 
   ::selection {
-    background: var(--color-signal);
-    color: var(--color-ink);
+    background: var(--color-oxblood);
+    color: var(--color-ivory);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-signal);
-    outline-offset: 4px;
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
   }
 
   img {
@@ -173,6 +146,12 @@
   p {
     text-wrap: pretty;
   }
+
+  [lang='mr'],
+  [lang='hi'] {
+    font-family: var(--font-accent);
+    font-style: normal;
+  }
 }
 
 /* Lenis (smooth scroll) recommended rules */
@@ -186,9 +165,6 @@ html.lenis body {
 .lenis [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
-}
 
 /* ------------------------------------------------------------------
    Utilities
@@ -198,208 +174,73 @@ html.lenis body {
   margin-inline: auto;
 }
 
-@utility grid-frame {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-  column-gap: var(--gutter);
-}
-
 @utility section-pad {
   padding-block: var(--section-pad);
 }
 
-@utility mono-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-mono);
-  line-height: var(--text-mono--line-height);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-}
-
-@utility headline {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
+/* Big grotesk type, set tight. */
 @utility display {
-  font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: 0;
+  font-weight: 500;
+  letter-spacing: -0.055em;
 }
 
-@utility stage {
-  height: 100svh;
-  min-height: 34rem;
+/* The accent: one italic word in Tiro, a touch larger to sit with the grotesk. */
+@utility accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-size: 1.08em;
 }
 
-/* Text split by SplitText: keep descenders clear inside line masks. */
+/* Small uppercase labels, in the machine's voice. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@utility mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
 .split-line {
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
 }
 
-/* Wordmark sizing (hero). Landscape: one line inside the subject frame.
-   Portrait: stacked F / O / V (DESIGN.md §7.1). */
-.wordmark {
-  font-family: var(--font-display);
-  font-weight: 800;
-  line-height: 0.8;
-  font-size: min(14.2vw, 30svh);
-  white-space: nowrap;
-}
-.wordmark > span {
-  display: inline-block;
-}
-@media (orientation: portrait) {
-  .wordmark {
-    font-size: min(29vw, 14.5svh);
-    line-height: 0.86;
-    white-space: normal;
-  }
-  .wordmark > span {
-    display: block;
-  }
+.logo-mask {
+  display: block;
+  aspect-ratio: 1100 / 506;
+  background: currentColor;
+  mask: var(--logo-url) center / contain no-repeat;
 }
 
-/* Services (desktop): one name in focus, its details in the shared panel.
-   Reduced motion keeps the stacked mobile layout instead of a pinned stage. */
-@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-  [data-services-stage] [data-service] h3 {
-    /* 0.4 keeps inactive names at ~3.3:1 (AA for large text) while the
-       active one sits at full strength. */
-    opacity: 0.4;
-    transition: opacity 0.7s var(--ease-lens);
-  }
-  [data-services-stage] .service-detail {
-    opacity: 0;
-    translate: 0 14px;
-    visibility: hidden;
-    transition:
-      opacity 0.6s var(--ease-lens),
-      translate 0.8s var(--ease-lens),
-      visibility 0s 0.6s;
-  }
-  [data-services-stage][data-active='0'] [data-service='0'] h3,
-  [data-services-stage][data-active='1'] [data-service='1'] h3,
-  [data-services-stage][data-active='2'] [data-service='2'] h3 {
-    opacity: 1;
-  }
-  [data-services-stage][data-active='0'] [data-service='0'] .service-detail,
-  [data-services-stage][data-active='1'] [data-service='1'] .service-detail,
-  [data-services-stage][data-active='2'] [data-service='2'] .service-detail {
-    opacity: 1;
-    translate: 0 0;
-    visibility: visible;
-    transition:
-      opacity 0.6s var(--ease-lens) 0.15s,
-      translate 0.8s var(--ease-lens) 0.15s,
-      visibility 0s;
-  }
-}
-
-/* Work: hovering one piece racks it into focus and softens the others. */
-@media (hover: hover) and (pointer: fine) {
-  [data-work-list] [data-media] {
-    transition:
-      filter 0.7s var(--ease-focus),
-      opacity 0.7s var(--ease-focus);
-  }
-  [data-work-list]:has(a:hover) a:not(:hover) [data-media] {
-    filter: blur(4px);
-    opacity: 0.55;
-  }
-}
-
-/* When WebGL draws the work media and the dolly demo, hide the DOM stand-ins
-   (labels stay). Set on <html> by three/WorkPlanes and three/DollyDemo. */
-html[data-webgl-media] [data-work-list] [data-media-art],
-html[data-webgl-demo] [data-dolly-fallback] {
-  opacity: 0;
-}
-html[data-webgl-demo] [data-dolly-view],
-html[data-webgl-demo] [data-dolly-tile] {
-  background: transparent;
-}
-
-/* Range input (Open: dolly zoom demo) */
-.lens-range {
-  appearance: none;
-  width: 100%;
-  height: 28px;
-  background: transparent;
-  cursor: ew-resize;
-}
-.lens-range::-webkit-slider-runnable-track {
-  height: 1px;
-  background: var(--color-paper);
-}
-.lens-range::-moz-range-track {
-  height: 1px;
-  background: var(--color-paper);
-}
-.lens-range::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px;
-  height: 22px;
-  margin-top: -11px;
-  background: var(--color-signal);
-  border: 0;
-  border-radius: 0;
-}
-.lens-range::-moz-range-thumb {
-  width: 14px;
-  height: 22px;
-  background: var(--color-signal);
-  border: 0;
-  border-radius: 0;
-}
-
-/* Horizontal rail (mobile Open tiles) */
-.rail {
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-.rail::-webkit-scrollbar {
+/* Preloader: hidden without JS. */
+html:not(.js) [data-preloader] {
   display: none;
 }
-.rail > * {
-  scroll-snap-align: start;
-}
 
-/* Prerendered HTML: start the hero in its intro state so hydration never flashes. */
-.js [data-vision] {
-  opacity: 0;
-}
+/* Prerendered HTML starts the hero in its intro state so hydration never flashes. */
 @media (prefers-reduced-motion: no-preference) {
-  .js [data-wordmark] {
-    filter: blur(16px);
+  .js [data-intro] {
+    opacity: 0;
   }
 }
 
-/* Signal-yellow end card flips the nav to ink. */
-[data-nav-theme='signal'] {
-  --nav-scrim: rgb(233 196 64 / 0.92);
-  --nav-fg: var(--color-ink);
-  --nav-bg-hover: var(--color-ink);
-  --nav-fg-hover: var(--color-signal);
-}
-[data-nav-theme='ink'] {
-  --nav-scrim: rgb(11 11 10 / 0.88);
-  --nav-fg: var(--color-paper);
-  --nav-bg-hover: var(--color-paper);
-  --nav-fg-hover: var(--color-ink);
-}
-
-/* Reduced motion: GSAP timelines branch on gsap.matchMedia(); CSS only
-   needs to stop anything that travels. Opacity fades stay. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .motion-travel {
-    transition-property: opacity, color, background-color, border-color !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

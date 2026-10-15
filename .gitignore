@@ -25,3 +25,8 @@ dist-ssr
 
 # QA output
 qa/
+
+# Kept out of the public repo (see docs/CREDITS.md, "Files not in the repo")
+public/fonts/GeneralSans-Variable.woff2
+src/assets/home/marine-drive-sunset.mp4
+src/assets/home/marine-drive-sunset-poster.webp

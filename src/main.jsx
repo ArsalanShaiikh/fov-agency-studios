@@ -14,4 +14,4 @@ const app = (
 if (container.hasChildNodes()) hydrateRoot(container, app)
 else createRoot(container).render(app)
 
-window.__fovBooted = true
+window.__bcBooted = true
